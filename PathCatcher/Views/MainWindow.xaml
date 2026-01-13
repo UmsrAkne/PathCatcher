@@ -4,10 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:PathCatcher.Models"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:viewModels="clr-namespace:PathCatcher.ViewModels"
     Title="{Binding Title}"
-    Width="525"
+    Width="1024"
     Height="350"
     d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
     prism:ViewModelLocator.AutoWireViewModel="True"
@@ -20,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
+            <ColumnDefinition Width="300" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
@@ -33,7 +34,27 @@
         <Border
             Grid.Row="0"
             Grid.Column="1"
-            Background="LightBlue" />
+            Background="LightBlue">
+            <ListBox x:Name="HistoryListBox" ItemsSource="{Binding Histories}">
+
+                <ListBox.InputBindings>
+                    <KeyBinding
+                        Key="C"
+                        Command="{Binding CopyFromHistoryCommand}"
+                        CommandParameter="{Binding ElementName=HistoryListBox, Path=SelectedItem}"
+                        Modifiers="Control" />
+                </ListBox.InputBindings>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:CopyHistory}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="10,0" Text="{Binding DateTime, StringFormat=HH:mm:ss}" />
+                            <TextBlock Text="{Binding FilePath}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
 
         <StackPanel
             Grid.Row="1"

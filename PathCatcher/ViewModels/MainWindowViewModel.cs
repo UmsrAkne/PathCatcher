@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using PathCatcher.Core;
+using PathCatcher.Models;
 using PathCatcher.Utils;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -30,6 +31,8 @@ public class MainWindowViewModel : BindableBase
 
     public ObservableCollection<string> DirectoryPaths { get; set; } = new ();
 
+    public ObservableCollection<CopyHistory> Histories { get; set; } = new ();
+
     public string PendingPath { get => pendingPath; set => SetProperty(ref pendingPath, value); }
 
     public DelegateCommand AddDPathCommand => new (() =>
@@ -37,22 +40,19 @@ public class MainWindowViewModel : BindableBase
         AddPath(PendingPath);
     });
 
-    public void AddPath(string path)
+    public DelegateCommand<CopyHistory> CopyFromHistoryCommand => new ((history) =>
     {
-        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+        if (history == null)
         {
             return;
         }
 
-        // 重複回避（大文字小文字を無視）
-        if (DirectoryPaths.Any(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)))
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            return;
-        }
-
-        DirectoryPaths.Add(path);
-        watchService.StartWatch(path);
-    }
+            var files = new StringCollection { history.FilePath, };
+            Clipboard.SetFileDropList(files);
+        });
+    });
 
     public void SavePathsToFile()
     {
@@ -69,6 +69,23 @@ public class MainWindowViewModel : BindableBase
         {
             Debug.WriteLine($"Failed to save config (unauthorized): {ex}");
         }
+    }
+
+    private void AddPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+        {
+            return;
+        }
+
+        // 重複回避（大文字小文字を無視）
+        if (DirectoryPaths.Any(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        DirectoryPaths.Add(path);
+        watchService.StartWatch(path);
     }
 
     private void LoadPathsFromFile()
@@ -111,6 +128,10 @@ public class MainWindowViewModel : BindableBase
         Application.Current.Dispatcher.Invoke(() =>
         {
             Clipboard.SetFileDropList(files);
+            Histories.Add(new CopyHistory()
+            {
+                FilePath = e.FullPath,
+            });
         });
     }
 }
