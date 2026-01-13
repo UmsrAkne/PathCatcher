@@ -37,23 +37,6 @@ public class MainWindowViewModel : BindableBase
         AddPath(PendingPath);
     });
 
-    public void AddPath(string path)
-    {
-        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-        {
-            return;
-        }
-
-        // 重複回避（大文字小文字を無視）
-        if (DirectoryPaths.Any(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)))
-        {
-            return;
-        }
-
-        DirectoryPaths.Add(path);
-        watchService.StartWatch(path);
-    }
-
     public void SavePathsToFile()
     {
         try
@@ -69,6 +52,23 @@ public class MainWindowViewModel : BindableBase
         {
             Debug.WriteLine($"Failed to save config (unauthorized): {ex}");
         }
+    }
+
+    private void AddPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+        {
+            return;
+        }
+
+        // 重複回避（大文字小文字を無視）
+        if (DirectoryPaths.Any(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        DirectoryPaths.Add(path);
+        watchService.StartWatch(path);
     }
 
     private void LoadPathsFromFile()
