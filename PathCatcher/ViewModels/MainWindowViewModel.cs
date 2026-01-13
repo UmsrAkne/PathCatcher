@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using PathCatcher.Core;
 using PathCatcher.Utils;
 using Prism.Commands;
@@ -39,5 +41,10 @@ public class MainWindowViewModel : BindableBase
     private void OnFileCreated(object sender, FileSystemEventArgs e)
     {
         Debug.WriteLine($"File added: {e.FullPath}");
+        var files = new StringCollection { e.FullPath, };
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            Clipboard.SetFileDropList(files);
+        });
     }
 }
