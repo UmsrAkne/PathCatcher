@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using PathCatcher.Core;
+using PathCatcher.Models;
 using PathCatcher.Utils;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -29,6 +30,8 @@ public class MainWindowViewModel : BindableBase
     public string Title => appVersionInfo.Title;
 
     public ObservableCollection<string> DirectoryPaths { get; set; } = new ();
+
+    public ObservableCollection<CopyHistory> Histories { get; set; } = new ();
 
     public string PendingPath { get => pendingPath; set => SetProperty(ref pendingPath, value); }
 
@@ -111,6 +114,10 @@ public class MainWindowViewModel : BindableBase
         Application.Current.Dispatcher.Invoke(() =>
         {
             Clipboard.SetFileDropList(files);
+            Histories.Add(new CopyHistory()
+            {
+                FilePath = e.FullPath,
+            });
         });
     }
 }
