@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace PathCatcher.Core
 {
@@ -52,8 +54,53 @@ namespace PathCatcher.Core
             watchers.Clear();
         }
 
-        private void OnCreated(object sender, FileSystemEventArgs e)
+        // ReSharper disable once AsyncVoidEventHandlerMethod
+        // イベントハンドラのため、シグネチャの変更は不可。
+        private static async Task<bool> WaitForFileReadyAsync(string path, TimeSpan timeout, int retryDelayMs = 200)
         {
+            var sw = Stopwatch.StartNew();
+
+            while (sw.Elapsed < timeout)
+            {
+                try
+                {
+                    await using var stream = new FileStream(
+                        path,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.None);
+
+                    // 開けた＝誰も掴んでない
+                    return true;
+                }
+                catch (IOException)
+                {
+                    // まだ書き込み中
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // 作成直後でアクセス不可なケース
+                }
+
+                await Task.Delay(retryDelayMs);
+            }
+
+            return false;
+        }
+
+        private async void OnCreated(object sender, FileSystemEventArgs e)
+        {
+            if (!File.Exists(e.FullPath))
+            {
+                return;
+            }
+
+            var ready = await WaitForFileReadyAsync(e.FullPath, TimeSpan.FromSeconds(10));
+            if (!ready)
+            {
+                return; // タイムアウト or 失敗
+            }
+
             FileCreated?.Invoke(this, e);
         }
     }
