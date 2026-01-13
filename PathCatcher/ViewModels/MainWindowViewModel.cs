@@ -40,6 +40,20 @@ public class MainWindowViewModel : BindableBase
         AddPath(PendingPath);
     });
 
+    public DelegateCommand<CopyHistory> CopyFromHistoryCommand => new ((history) =>
+    {
+        if (history == null)
+        {
+            return;
+        }
+
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var files = new StringCollection { history.FilePath, };
+            Clipboard.SetFileDropList(files);
+        });
+    });
+
     public void SavePathsToFile()
     {
         try

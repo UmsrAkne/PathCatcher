@@ -35,7 +35,16 @@
             Grid.Row="0"
             Grid.Column="1"
             Background="LightBlue">
-            <ListBox ItemsSource="{Binding Histories}">
+            <ListBox x:Name="HistoryListBox" ItemsSource="{Binding Histories}">
+
+                <ListBox.InputBindings>
+                    <KeyBinding
+                        Key="C"
+                        Command="{Binding CopyFromHistoryCommand}"
+                        CommandParameter="{Binding ElementName=HistoryListBox, Path=SelectedItem}"
+                        Modifiers="Control" />
+                </ListBox.InputBindings>
+
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:CopyHistory}">
                         <StackPanel Orientation="Horizontal">
