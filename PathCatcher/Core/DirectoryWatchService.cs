@@ -95,6 +95,13 @@ namespace PathCatcher.Core
                 return;
             }
 
+            var ext = Path.GetExtension(e.FullPath);
+            if (!string.Equals(ext, ".png", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(ext, ".txt", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             var ready = await WaitForFileReadyAsync(e.FullPath, TimeSpan.FromSeconds(10));
             if (!ready)
             {
