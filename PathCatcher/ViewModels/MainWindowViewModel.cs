@@ -38,6 +38,7 @@ public class MainWindowViewModel : BindableBase
     public DelegateCommand AddDPathCommand => new (() =>
     {
         AddPath(PendingPath);
+        PendingPath = string.Empty;
     });
 
     public DelegateCommand<CopyHistory> CopyFromHistoryCommand => new ((history) =>
