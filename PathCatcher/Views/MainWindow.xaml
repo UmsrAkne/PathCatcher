@@ -6,6 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:PathCatcher.Models"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:utils="clr-namespace:PathCatcher.Utils"
     xmlns:viewModels="clr-namespace:PathCatcher.ViewModels"
     Title="{Binding Title}"
     Width="1024"
@@ -14,6 +16,10 @@
     prism:ViewModelLocator.AutoWireViewModel="True"
     mc:Ignorable="d">
 
+    <Window.Resources>
+        <utils:LeftEllipsisConverter x:Key="LeftEllipsisConverter" />
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -21,7 +27,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
@@ -29,7 +35,15 @@
             Grid.Row="0"
             Grid.Column="0"
             Background="AntiqueWhite"
-            ItemsSource="{Binding DirectoryPaths}" />
+            ItemsSource="{Binding DirectoryPaths}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type system:String}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=50}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <Border
             Grid.Row="0"
@@ -49,7 +63,7 @@
                     <DataTemplate DataType="{x:Type models:CopyHistory}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="10,0" Text="{Binding DateTime, StringFormat=HH:mm:ss}" />
-                            <TextBlock Text="{Binding FilePath}" />
+                            <TextBlock Text="{Binding FilePath, Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=50}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
