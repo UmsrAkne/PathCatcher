@@ -129,7 +129,7 @@ public class MainWindowViewModel : BindableBase
         Application.Current.Dispatcher.Invoke(() =>
         {
             Clipboard.SetFileDropList(files);
-            Histories.Add(new CopyHistory()
+            Histories.Insert(0, new CopyHistory()
             {
                 FilePath = e.FullPath,
             });
