@@ -21,14 +21,16 @@ public class MainWindowViewModel : BindableBase
     private readonly DirectoryWatchService watchService = new();
     private string pendingPath = string.Empty;
     private CopyHistory selectedCopyHistory;
+    private string title;
 
     public MainWindowViewModel()
     {
         watchService.FileCreated += OnFileCreated;
         LoadPathsFromFile();
+        title = appVersionInfo.Title;
     }
 
-    public string Title => appVersionInfo.Title;
+    public string Title { get => title; set => SetProperty(ref title, value); }
 
     public ObservableCollection<string> DirectoryPaths { get; set; } = new ();
 
@@ -143,6 +145,22 @@ public class MainWindowViewModel : BindableBase
             };
 
             Histories.Insert(0, ch);
+            var fileName = Path.GetFileNameWithoutExtension(e.FullPath);
+            var displayName = TrimFromStart(fileName, 15);
+
+            Title = $"cp: {displayName}";
         });
+
+        return;
+
+        string TrimFromStart(string text, int maxLength)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+            {
+                return text;
+            }
+
+            return "…" + text[^(maxLength - 1) ..];
+        }
     }
 }
