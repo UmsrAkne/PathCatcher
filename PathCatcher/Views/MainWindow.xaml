@@ -10,7 +10,7 @@
     xmlns:utils="clr-namespace:PathCatcher.Utils"
     xmlns:viewModels="clr-namespace:PathCatcher.ViewModels"
     Title="{Binding Title}"
-    Width="1024"
+    Width="800"
     Height="350"
     d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
     prism:ViewModelLocator.AutoWireViewModel="True"
@@ -20,75 +20,109 @@
         <utils:LeftEllipsisConverter x:Key="LeftEllipsisConverter" />
     </Window.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <TabControl>
+        <TabItem Header="Directories">
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-        <ListBox
-            Grid.Row="0"
-            Grid.Column="0"
-            Background="AntiqueWhite"
-            ItemsSource="{Binding DirectoryPaths}">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type system:String}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=50}" />
+                <ListBox
+                    Grid.Row="0"
+                    Background="AntiqueWhite"
+                    ItemsSource="{Binding DirectoryPaths}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type system:String}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=50}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+
+                <StackPanel Grid.Row="1">
+                    <TextBlock Margin="5" Text="Enter the full path of the directory to monitor :" />
+
+                    <TextBox Margin="5,0" Text="{Binding PendingPath, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <StackPanel
+                        Margin="5"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+
+                        <Button
+                            Padding="20,3"
+                            Command="{Binding AddDPathCommand}"
+                            Content="Add directory" />
                     </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                </StackPanel>
+            </Grid>
+        </TabItem>
 
-        <Border
-            Grid.Row="0"
-            Grid.Column="1"
-            Background="LightBlue">
-            <ListBox x:Name="HistoryListBox" ItemsSource="{Binding Histories}">
+        <TabItem Header="Histories" IsSelected="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="0.75*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="LightBlue">
+                    <ListBox
+                        x:Name="HistoryListBox"
+                        ItemsSource="{Binding Histories}"
+                        SelectedItem="{Binding SelectedCopyHistory}">
 
-                <ListBox.InputBindings>
-                    <KeyBinding
-                        Key="C"
-                        Command="{Binding CopyFromHistoryCommand}"
-                        CommandParameter="{Binding ElementName=HistoryListBox, Path=SelectedItem}"
-                        Modifiers="Control" />
-                </ListBox.InputBindings>
+                        <ListBox.InputBindings>
+                            <KeyBinding
+                                Key="C"
+                                Command="{Binding CopyFromHistoryCommand}"
+                                CommandParameter="{Binding ElementName=HistoryListBox, Path=SelectedItem}"
+                                Modifiers="Control" />
+                        </ListBox.InputBindings>
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:CopyHistory}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Margin="10,0" Text="{Binding DateTime, StringFormat=HH:mm:ss}" />
-                            <TextBlock Text="{Binding FilePath, Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=50}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Border>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:CopyHistory}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Margin="10,0" Text="{Binding DateTime, StringFormat=HH:mm:ss}" />
+                                    <TextBlock Text="{Binding FilePath, Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=50}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+                <ContentControl Grid.Column="1">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedCopyHistory.ContentType}">
+                                    <DataTrigger.Value>
+                                        <models:ContentType>Text</models:ContentType>
+                                    </DataTrigger.Value>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <TextBox Text="{Binding SelectedCopyHistory.FilePath, Converter={StaticResource TextFileContentConverter}}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
 
-        <StackPanel
-            Grid.Row="1"
-            Grid.Column="0"
-            Grid.ColumnSpan="2">
-            <TextBlock Margin="5" Text="Enter the full path of the directory to monitor :" />
-
-            <TextBox Margin="5,0" Text="{Binding PendingPath, UpdateSourceTrigger=PropertyChanged}" />
-
-            <StackPanel
-                Margin="5"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
-
-                <Button
-                    Padding="20,3"
-                    Command="{Binding AddDPathCommand}"
-                    Content="Add directory" />
-            </StackPanel>
-        </StackPanel>
-    </Grid>
+                                <DataTrigger Binding="{Binding SelectedCopyHistory.ContentType}">
+                                    <DataTrigger.Value>
+                                        <models:ContentType>Image</models:ContentType>
+                                    </DataTrigger.Value>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{Binding SelectedCopyHistory.FilePath, Converter={StaticResource ImagePathToBitmapSourceConverter}}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </Grid>
+        </TabItem>
+    </TabControl>
 
 </Window>

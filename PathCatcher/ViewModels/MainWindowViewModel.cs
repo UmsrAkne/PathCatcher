@@ -20,18 +20,27 @@ public class MainWindowViewModel : BindableBase
     private readonly AppVersionInfo appVersionInfo = new ();
     private readonly DirectoryWatchService watchService = new();
     private string pendingPath = string.Empty;
+    private CopyHistory selectedCopyHistory;
+    private string title;
 
     public MainWindowViewModel()
     {
         watchService.FileCreated += OnFileCreated;
         LoadPathsFromFile();
+        title = appVersionInfo.Title;
     }
 
-    public string Title => appVersionInfo.Title;
+    public string Title { get => title; set => SetProperty(ref title, value); }
 
     public ObservableCollection<string> DirectoryPaths { get; set; } = new ();
 
     public ObservableCollection<CopyHistory> Histories { get; set; } = new ();
+
+    public CopyHistory SelectedCopyHistory
+    {
+        get => selectedCopyHistory;
+        set => SetProperty(ref selectedCopyHistory, value);
+    }
 
     public string PendingPath { get => pendingPath; set => SetProperty(ref pendingPath, value); }
 
@@ -129,10 +138,29 @@ public class MainWindowViewModel : BindableBase
         Application.Current.Dispatcher.Invoke(() =>
         {
             Clipboard.SetFileDropList(files);
-            Histories.Insert(0, new CopyHistory()
+            var ch = new CopyHistory
             {
                 FilePath = e.FullPath,
-            });
+                ContentType = ContentTypeDetector.DetectContentType(e.FullPath),
+            };
+
+            Histories.Insert(0, ch);
+            var fileName = Path.GetFileNameWithoutExtension(e.FullPath);
+            var displayName = TrimFromStart(fileName, 15);
+
+            Title = $"cp: {displayName}";
         });
+
+        return;
+
+        string TrimFromStart(string text, int maxLength)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+            {
+                return text;
+            }
+
+            return "…" + text[^(maxLength - 1) ..];
+        }
     }
 }
