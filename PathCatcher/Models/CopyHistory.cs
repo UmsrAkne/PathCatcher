@@ -7,5 +7,7 @@ namespace PathCatcher.Models
         public DateTime DateTime { get; set; } = DateTime.Now;
 
         public string FilePath { get; set; } = string.Empty;
+
+        public ContentType ContentType { get; set; } = ContentType.Other;
     }
 }

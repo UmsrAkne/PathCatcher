@@ -69,7 +69,10 @@
                     <ColumnDefinition Width="0.75*" />
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0" Background="LightBlue">
-                    <ListBox x:Name="HistoryListBox" ItemsSource="{Binding Histories}">
+                    <ListBox
+                        x:Name="HistoryListBox"
+                        ItemsSource="{Binding Histories}"
+                        SelectedItem="{Binding SelectedCopyHistory}">
 
                         <ListBox.InputBindings>
                             <KeyBinding
@@ -89,7 +92,35 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Border>
-                <ContentControl Grid.Column="1" />
+                <ContentControl Grid.Column="1">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedCopyHistory.ContentType}">
+                                    <DataTrigger.Value>
+                                        <models:ContentType>Text</models:ContentType>
+                                    </DataTrigger.Value>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <TextBox Text="{Binding SelectedCopyHistory.FilePath, Converter={StaticResource TextFileContentConverter}}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding SelectedCopyHistory.ContentType}">
+                                    <DataTrigger.Value>
+                                        <models:ContentType>Image</models:ContentType>
+                                    </DataTrigger.Value>
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <Image Source="{Binding SelectedCopyHistory.FilePath, Converter={StaticResource ImagePathToBitmapSourceConverter}}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
             </Grid>
         </TabItem>
     </TabControl>

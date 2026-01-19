@@ -20,6 +20,7 @@ public class MainWindowViewModel : BindableBase
     private readonly AppVersionInfo appVersionInfo = new ();
     private readonly DirectoryWatchService watchService = new();
     private string pendingPath = string.Empty;
+    private CopyHistory selectedCopyHistory;
 
     public MainWindowViewModel()
     {
@@ -32,6 +33,12 @@ public class MainWindowViewModel : BindableBase
     public ObservableCollection<string> DirectoryPaths { get; set; } = new ();
 
     public ObservableCollection<CopyHistory> Histories { get; set; } = new ();
+
+    public CopyHistory SelectedCopyHistory
+    {
+        get => selectedCopyHistory;
+        set => SetProperty(ref selectedCopyHistory, value);
+    }
 
     public string PendingPath { get => pendingPath; set => SetProperty(ref pendingPath, value); }
 
@@ -129,10 +136,13 @@ public class MainWindowViewModel : BindableBase
         Application.Current.Dispatcher.Invoke(() =>
         {
             Clipboard.SetFileDropList(files);
-            Histories.Insert(0, new CopyHistory()
+            var ch = new CopyHistory
             {
                 FilePath = e.FullPath,
-            });
+                ContentType = ContentTypeDetector.DetectContentType(e.FullPath),
+            };
+
+            Histories.Insert(0, ch);
         });
     }
 }
