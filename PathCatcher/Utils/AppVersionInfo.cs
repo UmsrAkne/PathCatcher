@@ -24,7 +24,10 @@ public class AppVersionInfo : BindableBase
 
     private string GetAppNameWithVersion()
     {
-        if (!string.IsNullOrWhiteSpace(CustomVersion)) return $"{ProjectName} ver:{CustomVersion}";
+        if (!string.IsNullOrWhiteSpace(CustomVersion))
+        {
+            return $"{ProjectName} ver:{CustomVersion}";
+        }
 
         var assembly = Assembly.GetExecutingAssembly();
         var infoVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
