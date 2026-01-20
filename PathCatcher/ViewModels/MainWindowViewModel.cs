@@ -13,7 +13,7 @@ using Prism.Mvvm;
 
 namespace PathCatcher.ViewModels;
 
-public class MainWindowViewModel : BindableBase
+public sealed class MainWindowViewModel : BindableBase, IDisposable
 {
     private readonly static string ConfigFilePath = Path.Combine(AppContext.BaseDirectory, "directory_paths.txt");
 
@@ -79,6 +79,11 @@ public class MainWindowViewModel : BindableBase
         {
             Debug.WriteLine($"Failed to save config (unauthorized): {ex}");
         }
+    }
+
+    public void Dispose()
+    {
+        watchService?.Dispose();
     }
 
     private void AddPath(string path)
