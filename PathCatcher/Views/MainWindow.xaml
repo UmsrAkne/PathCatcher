@@ -29,10 +29,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <ListBox
-                    Grid.Row="0"
-                    Background="AntiqueWhite"
-                    ItemsSource="{Binding DirectoryPaths}">
+                <ListBox Grid.Row="0" ItemsSource="{Binding DirectoryPaths}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type system:String}">
                             <StackPanel Orientation="Horizontal">
@@ -68,7 +65,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="0.75*" />
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" Background="LightBlue">
+                <Border Grid.Column="0">
                     <ListBox
                         x:Name="HistoryListBox"
                         ItemsSource="{Binding Histories}"
