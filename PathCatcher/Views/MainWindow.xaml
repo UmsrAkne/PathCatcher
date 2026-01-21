@@ -33,7 +33,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type system:String}">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=50}" />
+                                <TextBlock Text="{Binding Converter={StaticResource LeftEllipsisConverter}, ConverterParameter=70}" />
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
